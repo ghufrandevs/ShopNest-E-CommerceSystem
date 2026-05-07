@@ -297,7 +297,100 @@ namespace ShopNest_E_CommerceSystem
             return customers.Find(c => c.Email == email);
         }
 
+        public void PlaceOrder(string email, int productID)
+        {
+            Customer customer=FindCustomer(email);
+            if(customer == null)
+            {
+                Console.WriteLine("Customer not found");
+                return;
+            }        
 
+            Product product =products.Find(p=>p.ProductID == productID);
+            if(product == null)
+            {
+                Console.WriteLine("Product not found");
+                return;
+            }
+            Order placeOrder = new Order(customer, product);
+            orders.Add(placeOrder);
+            customer.AddOrder(placeOrder);
+            Console.WriteLine("Order placed successfully.");
+            Console.WriteLine("Order ID: " + placeOrder.OrderID);
+            Console.WriteLine("Total Cost: " + placeOrder.TotalCost);
+        }
+        public void CancelOrder(int orderID)
+        {
+            Order order=orders.Find(o => o.OrderID == orderID);
+                if(order == null)
+            {
+                Console.WriteLine("order not found");
+                return;
+            }
+                 order.Customer.RemoveOrder(orderID);
+            orders.RemoveAll(o => o.OrderID == orderID);
+            Console.WriteLine("Order cancelled successfully.");
 
+        }
+        public void DisplayCustomerOrders(string email)
+        {
+            Customer customer = FindCustomer(email);
+
+            if (customer == null)
+            {
+                Console.WriteLine("Customer not found");
+                return;
+            }
+
+            customer.DisplayInfo();
+
+            customer.DisplayOrderHistory();
+        }
+        private int CountPhysicalProducts()
+        {
+            int physicalCount = 0;
+            foreach (Product p in products)
+            {
+                if(p is PhysicalProduct)
+                {
+                    physicalCount++;
+                }
+                
+            }
+            return physicalCount;
+        }
+        private int CountDigitalProducts()
+        {
+            int digitalCount = 0;
+            foreach (Product p in products)
+            {
+                if(p is DigitalProduct)
+                {
+                    digitalCount++;
+                }
+            }
+            return digitalCount;
+        }
+        private double CalculateTotalRevenue()
+        {
+            double total = 0;
+
+            foreach (Order o in orders)
+            {
+                total += o.TotalCost;
+            }
+
+            return total;
+        }
+
+        public void DisplayStatistics()
+        {
+            Console.WriteLine("===== Store Statistics =====");
+            Console.WriteLine("Stor name: " + StoreName);
+            Console.WriteLine("Total product" + products.Count);
+            Console.WriteLine("Physical Products: " + CountPhysicalProducts());
+            Console.WriteLine("Digital product : " + CountDigitalProducts());
+            Console.WriteLine("Total Revenue: " + CalculateTotalRevenue());
+        }
     }
 }
