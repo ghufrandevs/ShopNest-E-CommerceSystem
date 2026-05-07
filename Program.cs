@@ -9,10 +9,7 @@ namespace ShopNest_E_CommerceSystem
             Console.WriteLine("Hello to ShopNest E-Commerce System");
         }
     }
-    class Hierarchy
-    {
-
-    }
+    
     abstract class Product
     {
         private static int nextProductID = 100;
@@ -90,6 +87,7 @@ namespace ShopNest_E_CommerceSystem
             Console.WriteLine("Price: " + Price);
             Console.WriteLine("weightKg: " +weightKg);
             Console.WriteLine("shippingCost " + shippingCostPerKg);
+            Console.WriteLine("Total Cost: " + CalculateTotalCost());
         }
         public override double CalculateTotalCost()
         {
@@ -116,6 +114,7 @@ namespace ShopNest_E_CommerceSystem
             Console.WriteLine("Price : " + price);
             Console.WriteLine("fileSize: " + fileSizeMB);
             Console.WriteLine("download link: " + downloadLink);
+            Console.WriteLine("Total Cost: " + CalculateTotalCost());
         }
         
 
@@ -219,8 +218,16 @@ namespace ShopNest_E_CommerceSystem
 
         //Auto-Implemented Read-Only Property
         public int OrderID { get; }
-        public Customer Customer { get; }
-        public double TotalCost { get; }
+        public Customer Customer
+        {
+            get { return customer; }
+        }
+        public double TotalCost
+        {
+            get { return totalCost; }
+        }
+
+
         public Order(Customer customer, Product product)
         {
             OrderID = nextOrderID++;
@@ -386,11 +393,14 @@ namespace ShopNest_E_CommerceSystem
         public void DisplayStatistics()
         {
             Console.WriteLine("===== Store Statistics =====");
-            Console.WriteLine("Stor name: " + StoreName);
+            Console.WriteLine("Store name: " + StoreName);
             Console.WriteLine("Total product" + products.Count);
             Console.WriteLine("Physical Products: " + CountPhysicalProducts());
             Console.WriteLine("Digital product : " + CountDigitalProducts());
             Console.WriteLine("Total Revenue: " + CalculateTotalRevenue());
+            Console.WriteLine("Registered Customers: " + customers.Count);
+            Console.WriteLine("Total Orders: " + orders.Count);
+            Console.WriteLine(  "Total Users Created: " + User.GetTotalUsersCreated() );
         }
     }
 }
