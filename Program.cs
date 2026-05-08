@@ -4,9 +4,102 @@ namespace ShopNest_E_CommerceSystem
 {
     internal class Program
     {
+        static public void ShowMenue()
+        {
+            Console.WriteLine("========== Hello to ShopNest E-Commerce System ==========");
+            Console.WriteLine("1.Add Physical Product");
+            Console.WriteLine("2.Add Digital Product");
+            Console.WriteLine("3.Display All Products");
+            Console.WriteLine("4.Register Customer");
+            Console.WriteLine("5.Place Order");
+            Console.WriteLine("6.Cancel Order");
+            Console.WriteLine("7.View Customer Order History");
+            Console.WriteLine("8.Show Store Statistics");
+            Console.WriteLine("0.Exit");
+            Console.WriteLine("Enter your choice: ");
+
+
+
+
+        } 
+        static public void AddPhysicalProduct(Store store)
+        {
+            //string name, double price, double weightKg, double shippingCostPerKg
+            Console.WriteLine("Enter Name : ");
+            string name = (Console.ReadLine() ?? string.Empty).Trim();
+            while (string.IsNullOrWhiteSpace(name))
+            {
+                Console.WriteLine("Name cannot be empty. Please re-enter:");
+                name = (Console.ReadLine() ?? string.Empty).Trim();
+            }
+
+            Console.WriteLine("Enter price : ");
+            double price;
+            while (!double.TryParse(Console.ReadLine(), out price))
+            {
+                Console.WriteLine("Invalid input. Please enter a valid number:");
+            }
+            
+            Console.WriteLine("Enter weightKg : ");
+            double weightKg;
+            while (!double.TryParse(Console.ReadLine(), out weightKg))
+            {
+                Console.WriteLine("Invalid input. Please enter a valid number:");
+            }
+
+            Console.WriteLine("Enter shippingCostPerKg: ");
+            double shippingCostPerKg;
+            while (!double.TryParse(Console.ReadLine(), out shippingCostPerKg))
+            {
+                Console.WriteLine("Invalid input. Please enter a valid number:");
+            }
+            store.AddPhysicalProduct(name, price, weightKg, shippingCostPerKg);
+
+        }
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello to ShopNest E-Commerce System");
+            Store store=new Store("ShopNest");
+
+            int option = 0;
+            bool exit= false;
+            while(!exit)
+            {
+                ShowMenue();
+                try
+                {
+                    option = int.Parse(Console.ReadLine());
+                }
+                catch (FormatException)
+                {
+                    Console.WriteLine("Invalid input. Please choose a number from 0 to 8");
+                    continue;
+                }
+                switch(option)
+                {
+                    case 1://Add Physical Product
+                        AddPhysicalProduct(store);
+                        break;
+                        case 2: 
+                        break;
+                        case 3:
+                        break;
+                        case 4:
+                        break;
+                        case 5:
+                        break;
+                        case 6:
+                        break;
+                        case 7:
+                        break;
+                        case 8:
+                        break;
+                        case 0:
+                        break; 
+                }
+
+
+            }
+
         }
     }
     
@@ -152,7 +245,7 @@ namespace ShopNest_E_CommerceSystem
         
 
     }
-       class Customer :User
+    class Customer :User
     {
         private List<Order> orders;
         public Customer(string fullName, string email) : base(fullName, email) 
