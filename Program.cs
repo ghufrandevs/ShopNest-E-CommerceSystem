@@ -39,9 +39,6 @@ namespace ShopNest_E_CommerceSystem
             Console.WriteLine("0.Exit");
             Console.WriteLine("Enter your choice: ");
 
-
-
-
         }
 
         static public void  AddDigitalProduct(Store store)
@@ -111,7 +108,6 @@ namespace ShopNest_E_CommerceSystem
             store.AddPhysicalProduct(name, price, weightKg, shippingCostPerKg);
 
         }
-        //string fullName, string email
         static public void RegisterCustomer(Store store)
         {
             Console.WriteLine("Enter FullName : ");
@@ -142,7 +138,63 @@ namespace ShopNest_E_CommerceSystem
              store.RegisterCustomer(FullName, Email);
 
         }
+        static public void PlaceOrder(Store store)
+        {
+            string Email;
+            int productID;
 
+            while (true)
+            {
+                Console.WriteLine("Enter Email : ");
+                Email = (Console.ReadLine() ?? string.Empty).Trim();
+                while (string.IsNullOrWhiteSpace(Email))
+                {
+                    Console.WriteLine("Email cannot be empty. Please re-enter:");
+                    Email = (Console.ReadLine() ?? string.Empty).Trim();
+                }
+                if (store.FindCustomer(Email) == null)
+                {
+                    Console.WriteLine("Customer not found ");
+                    continue;
+                }
+
+                Console.WriteLine("Enter Product ID:");
+                while (!int.TryParse(Console.ReadLine(), out productID))
+                {
+                    Console.WriteLine("Invalid input. Please enter a valid number:");
+                }
+                
+                break;
+            }
+            store.PlaceOrder(Email, productID);
+        }
+        static public void CancelOrder(Store store)
+        {
+            Console.WriteLine("Entre orderID ");
+            int orderID;
+            while (!int.TryParse(Console.ReadLine(), out orderID))
+            {
+                Console.WriteLine("Invalid input. Please enter a valid number:");
+            }
+            store.CancelOrder(orderID);
+        }
+        static public void ViewCustomerOrderHistory(Store store)
+        {
+            string email;
+
+            Console.WriteLine("Enter Email:");
+
+            email = (Console.ReadLine() ?? string.Empty).Trim();
+
+            while (string.IsNullOrWhiteSpace(email))
+            {
+                Console.WriteLine("Email cannot be empty. Please re-enter:");
+
+                email = (Console.ReadLine() ?? string.Empty).Trim();
+            }
+
+            store.DisplayCustomerOrders(email);
+        }
 
 
         static void Main(string[] args)
@@ -181,14 +233,22 @@ namespace ShopNest_E_CommerceSystem
                         RegisterCustomer(store);
                         break;
 
-                        case 5:
+                        case 5://Place Order
+                        PlaceOrder(store);
                         break;
-                        case 6:
+
+                        case 6://Cancel Order
+                        CancelOrder(store);
                         break;
-                        case 7:
+
+                        case 7://View Customer Order History
+                        ViewCustomerOrderHistory(store);
                         break;
-                        case 8:
+
+                        case 8://Show Store Statistics
+                        store.DisplayStatistics();
                         break;
+
                         case 0:
                         exit=ExitSystem();
                         break; 
