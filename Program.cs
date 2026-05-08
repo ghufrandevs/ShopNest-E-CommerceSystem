@@ -1,9 +1,30 @@
-﻿using System.Security.Cryptography.X509Certificates;
+﻿using Microsoft.Win32;
+using System;
+using System.Security.Cryptography.X509Certificates;
 
 namespace ShopNest_E_CommerceSystem
 {
     internal class Program
     {
+        public static bool ExitSystem()
+        {
+            Console.WriteLine("Are you sure you want to exit the system? (yes/no)");
+            string inputs = (Console.ReadLine() ?? string.Empty).ToLower();
+            if (inputs == "no")
+            {
+                return false;
+            }
+            else if (inputs == "yes")
+            {
+                Console.WriteLine("Thank you for using the system --Exit--");
+                return true;
+            }
+            else
+            {
+                Console.WriteLine("Invalid option");
+                return false;
+            }
+        }
         static public void ShowMenue()
         {
             Console.WriteLine("========== Hello to ShopNest E-Commerce System ==========");
@@ -21,10 +42,44 @@ namespace ShopNest_E_CommerceSystem
 
 
 
-        } 
+        }
+
+        static public void  AddDigitalProduct(Store store)
+        {
+            Console.WriteLine("Enter Name : ");
+            string name = (Console.ReadLine() ?? string.Empty).Trim();
+            while (string.IsNullOrWhiteSpace(name))
+            {
+                Console.WriteLine("Name cannot be empty. Please re-enter:");
+                name = (Console.ReadLine() ?? string.Empty).Trim();
+            }
+
+            Console.WriteLine("Enter price : ");
+            double price;
+            while (!double.TryParse(Console.ReadLine(), out price))
+            {
+                Console.WriteLine("Invalid input. Please enter a valid number:");
+            }
+
+            Console.WriteLine("Enter fileSizeMB : ");
+            double fileSizeMB;
+            while (!double.TryParse(Console.ReadLine(), out fileSizeMB))
+            {
+                Console.WriteLine("Invalid input. Please enter a valid number:");
+            }
+
+            Console.WriteLine("Enter link : ");
+            string link = (Console.ReadLine() ?? string.Empty).Trim();
+            while (string.IsNullOrWhiteSpace(link))
+            {
+                Console.WriteLine("Name cannot be empty. Please re-enter:");
+                link = (Console.ReadLine() ?? string.Empty).Trim();
+            }
+            store.AddDigitalProduct(name, price, fileSizeMB,link);
+
+        }
         static public void AddPhysicalProduct(Store store)
         {
-            //string name, double price, double weightKg, double shippingCostPerKg
             Console.WriteLine("Enter Name : ");
             string name = (Console.ReadLine() ?? string.Empty).Trim();
             while (string.IsNullOrWhiteSpace(name))
@@ -56,6 +111,40 @@ namespace ShopNest_E_CommerceSystem
             store.AddPhysicalProduct(name, price, weightKg, shippingCostPerKg);
 
         }
+        //string fullName, string email
+        static public void RegisterCustomer(Store store)
+        {
+            Console.WriteLine("Enter FullName : ");
+            string FullName = (Console.ReadLine() ?? string.Empty).Trim();
+            while (string.IsNullOrWhiteSpace(FullName))
+            {
+                Console.WriteLine("Name cannot be empty. Please re-enter:");
+                FullName = (Console.ReadLine() ?? string.Empty).Trim();
+            }
+            string Email;
+            while(true)
+            {
+                Console.WriteLine("Enter Email : ");
+                Email = (Console.ReadLine() ?? string.Empty).Trim();
+                while (string.IsNullOrWhiteSpace(Email))
+                {
+                    Console.WriteLine("Email cannot be empty. Please re-enter:");
+                    Email = (Console.ReadLine() ?? string.Empty).Trim();
+                }
+                if (store.FindCustomer(Email) != null)
+                {
+                    Console.WriteLine("Email already exists. Try another email.");
+                    continue;
+                }
+                break;
+            }
+            
+             store.RegisterCustomer(FullName, Email);
+
+        }
+
+
+
         static void Main(string[] args)
         {
             Store store=new Store("ShopNest");
@@ -79,12 +168,19 @@ namespace ShopNest_E_CommerceSystem
                     case 1://Add Physical Product
                         AddPhysicalProduct(store);
                         break;
-                        case 2: 
+
+                        case 2: //Add Digital Product
+                        AddDigitalProduct(store);
                         break;
-                        case 3:
+
+                        case 3://Display All Products
+                        store.DisplayAllProducts();
                         break;
-                        case 4:
+
+                        case 4://Register Customer
+                        RegisterCustomer(store);
                         break;
+
                         case 5:
                         break;
                         case 6:
@@ -94,9 +190,14 @@ namespace ShopNest_E_CommerceSystem
                         case 8:
                         break;
                         case 0:
+                        exit=ExitSystem();
                         break; 
                 }
-
+                if (!exit)
+                {
+                    Console.ReadLine();
+                    Console.Clear();
+                }
 
             }
 
