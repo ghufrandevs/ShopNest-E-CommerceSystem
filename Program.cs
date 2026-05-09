@@ -1,7 +1,5 @@
-﻿using Microsoft.Win32;
-using System;
-using System.Security.Cryptography.X509Certificates;
-
+﻿
+using System.Linq;
 namespace ShopNest_E_CommerceSystem
 {
     internal class Program
@@ -25,7 +23,7 @@ namespace ShopNest_E_CommerceSystem
                 return false;
             }
         }
-        static public void ShowMenue()
+        static public void ShowMenu()
         {
             Console.WriteLine("========== Hello to ShopNest E-Commerce System ==========");
             Console.WriteLine("1.Add Physical Product");
@@ -43,7 +41,7 @@ namespace ShopNest_E_CommerceSystem
 
         static public void  AddDigitalProduct(Store store)
         {
-            Console.WriteLine("Enter Name : ");
+            Console.WriteLine("Enter Product Name : ");
             string name = (Console.ReadLine() ?? string.Empty).Trim();
             while (string.IsNullOrWhiteSpace(name))
             {
@@ -52,17 +50,19 @@ namespace ShopNest_E_CommerceSystem
             }
 
             Console.WriteLine("Enter price : ");
+
             double price;
-            while (!double.TryParse(Console.ReadLine(), out price))
+
+            while (!double.TryParse(Console.ReadLine(), out price) || price <= 0)
             {
-                Console.WriteLine("Invalid input. Please enter a valid number:");
+                Console.WriteLine("Price must be a positive number:");
             }
 
             Console.WriteLine("Enter fileSizeMB : ");
             double fileSizeMB;
-            while (!double.TryParse(Console.ReadLine(), out fileSizeMB))
+            while (!double.TryParse(Console.ReadLine(), out fileSizeMB) || fileSizeMB <= 0)
             {
-                Console.WriteLine("Invalid input. Please enter a valid number:");
+                Console.WriteLine("fileSizeMB must be a positive number:");
             }
 
             Console.WriteLine("Enter link : ");
@@ -87,23 +87,24 @@ namespace ShopNest_E_CommerceSystem
 
             Console.WriteLine("Enter price : ");
             double price;
-            while (!double.TryParse(Console.ReadLine(), out price))
+
+            while (!double.TryParse(Console.ReadLine(), out price) || price <= 0)
             {
-                Console.WriteLine("Invalid input. Please enter a valid number:");
+                Console.WriteLine("Price must be a positive number:");
             }
-            
+
             Console.WriteLine("Enter weightKg : ");
             double weightKg;
-            while (!double.TryParse(Console.ReadLine(), out weightKg))
+            while (!double.TryParse(Console.ReadLine(), out weightKg) || weightKg <= 0)
             {
-                Console.WriteLine("Invalid input. Please enter a valid number:");
+                Console.WriteLine("Weight must be a positive number:");
             }
 
             Console.WriteLine("Enter shippingCostPerKg: ");
             double shippingCostPerKg;
-            while (!double.TryParse(Console.ReadLine(), out shippingCostPerKg))
+            while (!double.TryParse(Console.ReadLine(), out shippingCostPerKg) || shippingCostPerKg <= 0)
             {
-                Console.WriteLine("Invalid input. Please enter a valid number:");
+                Console.WriteLine("shippingCost must be a positive number:");
             }
             store.AddPhysicalProduct(name, price, weightKg, shippingCostPerKg);
 
@@ -127,11 +128,7 @@ namespace ShopNest_E_CommerceSystem
                     Console.WriteLine("Email cannot be empty. Please re-enter:");
                     Email = (Console.ReadLine() ?? string.Empty).Trim();
                 }
-                if (store.FindCustomer(Email) != null)
-                {
-                    Console.WriteLine("Email already exists. Try another email.");
-                    continue;
-                }
+                
                 break;
             }
             
@@ -170,7 +167,7 @@ namespace ShopNest_E_CommerceSystem
         }
         static public void CancelOrder(Store store)
         {
-            Console.WriteLine("Entre orderID ");
+            Console.WriteLine("Entre Order ID ");
             int orderID;
             while (!int.TryParse(Console.ReadLine(), out orderID))
             {
@@ -205,17 +202,13 @@ namespace ShopNest_E_CommerceSystem
             bool exit= false;
             while(!exit)
             {
-                ShowMenue();
-                try
-                {
-                    option = int.Parse(Console.ReadLine());
-                }
-                catch (FormatException)
+                ShowMenu();
+                while (!int.TryParse(Console.ReadLine(), out option))
                 {
                     Console.WriteLine("Invalid input. Please choose a number from 0 to 8");
-                    continue;
                 }
-                switch(option)
+
+                switch (option)
                 {
                     case 1://Add Physical Product
                         AddPhysicalProduct(store);
@@ -283,21 +276,11 @@ namespace ShopNest_E_CommerceSystem
             get { return price; }
             set
             {
-                if (value <= 0)
-                {
-                    Console.WriteLine("Price must be greater than 0");
-                }
-                else
-                {
-                    price= value;
-                }
+                  price= value;           
             }
 
-
-
-
-
         }
+
         public Product(string name, double price)
         {
             this.name = name;
@@ -327,6 +310,10 @@ namespace ShopNest_E_CommerceSystem
         {
             get { return weightKg; }
         }
+        public double ShippingCostPerKg
+        {
+            get { return shippingCostPerKg; }
+        }
         public PhysicalProduct(string name, double price, double weightKg, double shippingCostPerKg) :base(name,price)
         {
             this.weightKg= weightKg;
@@ -336,16 +323,16 @@ namespace ShopNest_E_CommerceSystem
         public override void DisplayInfo()
         {
             Console.WriteLine("=============Physical Product===============");
-            Console.WriteLine("ProductID is : " + ProductID);
-            Console.WriteLine("name: " + name);
+            Console.WriteLine("Product ID  : " + ProductID);
+            Console.WriteLine("Product Name: " + Name);
             Console.WriteLine("Price: " + Price);
-            Console.WriteLine("weightKg: " +weightKg);
-            Console.WriteLine("shippingCost " + shippingCostPerKg);
+            Console.WriteLine("weightKg: " +WeightKg);
+            Console.WriteLine("shippingCost " + ShippingCostPerKg);
             Console.WriteLine("Total Cost: " + CalculateTotalCost());
         }
         public override double CalculateTotalCost()
         {
-            return price + (weightKg *shippingCostPerKg);
+            return price + (WeightKg *ShippingCostPerKg);
         }
 
 
@@ -360,12 +347,15 @@ namespace ShopNest_E_CommerceSystem
             this.fileSizeMB = fileSizeMB;
             this.downloadLink = downloadLink;
         }
-           public override void DisplayInfo()
+
+        // Digital products use the base CalculateTotalCost()
+        // because they do not include shipping costs.
+        public override void DisplayInfo()
         {
             Console.WriteLine("=============Digital Product============");
             Console.WriteLine("Product ID: " + ProductID);
-            Console.WriteLine("Product Name: " + name);
-            Console.WriteLine("Price : " + price);
+            Console.WriteLine("Product Name: " + Name);
+            Console.WriteLine("Price : " + Price);
             Console.WriteLine("fileSize: " + fileSizeMB);
             Console.WriteLine("download link: " + downloadLink);
             Console.WriteLine("Total Cost: " + CalculateTotalCost());
@@ -529,14 +519,23 @@ namespace ShopNest_E_CommerceSystem
         {
             DigitalProduct digitalProduct=new DigitalProduct(name,price,fileSizeMB,link);
             products.Add(digitalProduct);
-            Console.WriteLine($"Digital product added successfuly . ID:{digitalProduct.ProductID} ");
+            Console.WriteLine($"Digital product added successfully . ID:{digitalProduct.ProductID} ");
         }
 
         public void DisplayAllProducts()
         {
-            foreach(Product product in products)
+            if(products.Count==0)
+            {
+                Console.WriteLine("No products available");
+                return;
+            }
+            Console.WriteLine("========== Product List ==========");
+
+            foreach (Product product in products)
             {
                 product.DisplayInfo();
+                Console.WriteLine();
+
             }
         }
 
@@ -585,7 +584,7 @@ namespace ShopNest_E_CommerceSystem
             Order order=orders.Find(o => o.OrderID == orderID);
                 if(order == null)
             {
-                Console.WriteLine("order not found");
+                Console.WriteLine("Order not found");
                 return;
             }
                  order.Customer.RemoveOrder(orderID);
@@ -609,52 +608,52 @@ namespace ShopNest_E_CommerceSystem
         }
         private int CountPhysicalProducts()
         {
-            int physicalCount = 0;
-            foreach (Product p in products)
-            {
-                if(p is PhysicalProduct)
-                {
-                    physicalCount++;
-                }
-                
-            }
-            return physicalCount;
+            return products.OfType<PhysicalProduct>().Count();
         }
+            //using LINQ 
+            //// Replaced manual foreach counting loop with LINQ OfType<T>().Count()
+            // to count only PhysicalProduct objects in a cleaner and more readable way.
+       //     private int CountPhysicalProducts()
+       //     (foreach way:)
+       //     {
+       //        int physicalCount = 0;
+       //        foreach (Product p in products)
+       //         {
+       //             if (p is PhysicalProduct)
+       //            {
+       //                // physicalCount++;
+       //             }
+
+       //         }
+       //        return physicalCount;
+       //     }
+       //}
+        
         private int CountDigitalProducts()
         {
-            int digitalCount = 0;
-            foreach (Product p in products)
-            {
-                if(p is DigitalProduct)
-                {
-                    digitalCount++;
-                }
-            }
-            return digitalCount;
+            return products.OfType<DigitalProduct>().Count();
         }
         private double CalculateTotalRevenue()
         {
-            double total = 0;
-
-            foreach (Order o in orders)
-            {
-                total += o.TotalCost;
-            }
-
-            return total;
+            return orders.Sum(o => o.TotalCost);
         }
 
         public void DisplayStatistics()
         {
+            if (products.Count == 0 && customers.Count == 0 && orders.Count == 0)
+            {
+                Console.WriteLine("No store data available.");
+                return;
+            }
             Console.WriteLine("===== Store Statistics =====");
-            Console.WriteLine("Store name: " + StoreName);
-            Console.WriteLine("Total product" + products.Count);
-            Console.WriteLine("Physical Products: " + CountPhysicalProducts());
-            Console.WriteLine("Digital product : " + CountDigitalProducts());
-            Console.WriteLine("Total Revenue: " + CalculateTotalRevenue());
-            Console.WriteLine("Registered Customers: " + customers.Count);
-            Console.WriteLine("Total Orders: " + orders.Count);
-            Console.WriteLine(  "Total Users Created: " + User.GetTotalUsersCreated() );
+            Console.WriteLine($"Store name: {StoreName}");
+            Console.WriteLine($"Total Product : {products.Count}");
+            Console.WriteLine($"Physical Products: {CountPhysicalProducts()}");
+            Console.WriteLine($"Digital Product : {CountDigitalProducts()}");
+            Console.WriteLine($"Total Revenue: {CalculateTotalRevenue()}");
+            Console.WriteLine($"Registered Customers: {customers.Count}");
+            Console.WriteLine($"Total Orders: {orders.Count}");
+            Console.WriteLine($"Total Users Created: {User.GetTotalUsersCreated()}" );
         }
     }
 }
