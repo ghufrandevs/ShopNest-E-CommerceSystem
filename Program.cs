@@ -35,6 +35,7 @@ namespace ShopNest_E_CommerceSystem
             Console.WriteLine("8.Show Store Statistics");
             Console.WriteLine("9.Display Physical Products");
             Console.WriteLine("10.Display Digital Products");
+            Console.WriteLine("11.Apply Discount To Digital Product");
             Console.WriteLine("0.Exit");
             Console.WriteLine("Enter your choice: ");
 
@@ -193,7 +194,30 @@ namespace ShopNest_E_CommerceSystem
 
             store.DisplayCustomerOrders(email);
         }
-        
+        static public void ApplyDiscountCase(Store store)
+        {
+            Console.WriteLine("Enter Product ID:");
+
+            int productID;
+
+            while (!int.TryParse(Console.ReadLine(), out productID))
+            {
+                Console.WriteLine("Invalid input. Please enter a valid number:");
+            }
+
+            Console.WriteLine("Enter Discount Percent:");
+
+            double percent;
+
+            while (!double.TryParse(Console.ReadLine(), out percent))
+            {
+                Console.WriteLine("Invalid input. Please enter a valid number:");
+            }
+
+            store.ApplyDiscountToDigitalProduct(productID, percent);
+        }
+
+
 
         static void Main(string[] args)
         {
@@ -207,7 +231,7 @@ namespace ShopNest_E_CommerceSystem
                 ShowMenu();
                 while (!int.TryParse(Console.ReadLine(), out option))
                 {
-                    Console.WriteLine("Invalid input. Please choose a number from 0 to 10");
+                    Console.WriteLine("Invalid input. Please choose a number from 0 to 11");
                 }
 
                 switch (option)
@@ -250,6 +274,10 @@ namespace ShopNest_E_CommerceSystem
 
                         case 10:
                         store.DisplayDigitalProducts();
+                        break;
+
+                        case 11:
+                        ApplyDiscountCase(store);
                         break;
 
                         case 0:
@@ -352,14 +380,14 @@ namespace ShopNest_E_CommerceSystem
     {
         private double fileSizeMB;
         private string downloadLink;
+        private double discountPercent;
         public DigitalProduct(string name, double price, double fileSizeMB, string downloadLink) : base(name, price)
         {
             this.fileSizeMB = fileSizeMB;
             this.downloadLink = downloadLink;
         }
 
-        // Digital products use the base CalculateTotalCost()
-        // because they do not include shipping costs.
+        
         public override void DisplayInfo()
         {
             Console.WriteLine("=============Digital Product============");
@@ -371,8 +399,26 @@ namespace ShopNest_E_CommerceSystem
             Console.WriteLine("Total Cost: " + CalculateTotalCost());
         }
         
+        public override double CalculateTotalCost()
+        {
+            return price * (1 - (discountPercent / 100));
+        }
 
+        public void ApplyDiscount(double percent)
+        {
+          
+            if (percent < 0 || percent > 100)
+            {
+                Console.WriteLine("Discount must be between 0 and 100.");
+                return;
+            }
+
+            discountPercent = percent;
+
+            Console.WriteLine($"Discount of {percent}% applied successfully.");
+        }
     }
+    
 
 
     abstract class User
@@ -702,6 +748,35 @@ namespace ShopNest_E_CommerceSystem
             Console.WriteLine($"Registered Customers: {customers.Count}");
             Console.WriteLine($"Total Orders: {orders.Count}");
             Console.WriteLine($"Total Users Created: {User.GetTotalUsersCreated()}" );
+        }
+
+        public void ApplyDiscountToDigitalProduct(int productID, double percent)
+        {
+
+            Product product = products.Find(o => o.ProductID == productID);
+                {
+                if (product == null)
+                {
+                    Console.WriteLine("Product not found.");
+                    return;
+                }
+                if (product is DigitalProduct)
+                {
+                    DigitalProduct digitalProduct = (DigitalProduct)product;//// Cast Product to DigitalProduct to access ApplyDiscount(),
+                                                                            // because ApplyDiscount() exists only in DigitalProduct.
+
+                    digitalProduct.ApplyDiscount(percent);
+
+                    Console.WriteLine("Discount applied successfully");
+                }
+                else
+                {
+                    Console.WriteLine("This product is not a digital product");
+                }
+            
+        }
+
+            
         }
     }
 }
