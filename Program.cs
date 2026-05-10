@@ -25,7 +25,6 @@ namespace ShopNest_E_CommerceSystem
         }
         static public void ShowMenu()
         {
-            Console.WriteLine("========== Hello to ShopNest E-Commerce System ==========");
             Console.WriteLine("1.Add Physical Product");
             Console.WriteLine("2.Add Digital Product");
             Console.WriteLine("3.Display All Products");
@@ -34,6 +33,8 @@ namespace ShopNest_E_CommerceSystem
             Console.WriteLine("6.Cancel Order");
             Console.WriteLine("7.View Customer Order History");
             Console.WriteLine("8.Show Store Statistics");
+            Console.WriteLine("9.Display Physical Products");
+            Console.WriteLine("10.Display Digital Products");
             Console.WriteLine("0.Exit");
             Console.WriteLine("Enter your choice: ");
 
@@ -192,10 +193,11 @@ namespace ShopNest_E_CommerceSystem
 
             store.DisplayCustomerOrders(email);
         }
-
+        
 
         static void Main(string[] args)
         {
+            Store.PrintSystemBanner();
             Store store=new Store("ShopNest");
 
             int option = 0;
@@ -205,7 +207,7 @@ namespace ShopNest_E_CommerceSystem
                 ShowMenu();
                 while (!int.TryParse(Console.ReadLine(), out option))
                 {
-                    Console.WriteLine("Invalid input. Please choose a number from 0 to 8");
+                    Console.WriteLine("Invalid input. Please choose a number from 0 to 10");
                 }
 
                 switch (option)
@@ -240,6 +242,14 @@ namespace ShopNest_E_CommerceSystem
 
                         case 8://Show Store Statistics
                         store.DisplayStatistics();
+                        break;
+
+                        case 9:
+                        store.DisplayPhysicalProducts();
+                        break;
+
+                        case 10:
+                        store.DisplayDigitalProducts();
                         break;
 
                         case 0:
@@ -334,7 +344,7 @@ namespace ShopNest_E_CommerceSystem
         {
             return price + (WeightKg *ShippingCostPerKg);
         }
-
+        
 
     }
 
@@ -491,6 +501,10 @@ namespace ShopNest_E_CommerceSystem
     }
     class Store
     {
+        public static void PrintSystemBanner()
+        {
+            Console.WriteLine("===== Welcome to ShopNest =====");
+        }
         public string StoreName
         {
             get;private set;
@@ -535,6 +549,40 @@ namespace ShopNest_E_CommerceSystem
             {
                 product.DisplayInfo();
                 Console.WriteLine();
+
+            }
+        }
+
+
+        public void DisplayPhysicalProducts()
+        {
+            if( products.Count==0 )
+            {
+                Console.WriteLine("No products available");
+                return;
+            }
+            foreach (Product product in products)
+            {
+                if (product is PhysicalProduct)
+                {
+                    product.DisplayInfo();
+                }
+
+            } 
+        }
+        public void DisplayDigitalProducts()
+        {
+            if (products.Count == 0)
+            {
+                Console.WriteLine("No products available");
+                return;
+            }
+            foreach (Product product in products)
+            {
+                if (product is DigitalProduct)
+                {
+                    product.DisplayInfo();
+                }
 
             }
         }
